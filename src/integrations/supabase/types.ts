@@ -16,32 +16,50 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          asaas_customer_id: string | null
           created_at: string
           email: string
           id: string
           name: string
           plan: string
           provas_utilizadas: number
+          subscription_end_date: string | null
+          subscription_id: string | null
+          subscription_plan: string | null
+          subscription_start_date: string | null
+          subscription_status: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          asaas_customer_id?: string | null
           created_at?: string
           email: string
           id?: string
           name: string
           plan?: string
           provas_utilizadas?: number
+          subscription_end_date?: string | null
+          subscription_id?: string | null
+          subscription_plan?: string | null
+          subscription_start_date?: string | null
+          subscription_status?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          asaas_customer_id?: string | null
           created_at?: string
           email?: string
           id?: string
           name?: string
           plan?: string
           provas_utilizadas?: number
+          subscription_end_date?: string | null
+          subscription_id?: string | null
+          subscription_plan?: string | null
+          subscription_start_date?: string | null
+          subscription_status?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -79,6 +97,39 @@ export type Database = {
           tema?: string
           tipo?: string
           titulo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          asaas_payment_id: string
+          created_at: string
+          id: string
+          plan: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          asaas_payment_id: string
+          created_at?: string
+          id?: string
+          plan: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          asaas_payment_id?: string
+          created_at?: string
+          id?: string
+          plan?: string
+          status?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []

@@ -2,3 +2,9 @@ project_id = "adfogztisprrlgjlmozy"
 
 [functions.generate-prova]
 verify_jwt = true
+
+[functions.asaas-payment]
+verify_jwt = true
+
+[functions.asaas-webhook]
+verify_jwt = false

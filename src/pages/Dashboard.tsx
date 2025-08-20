@@ -7,7 +7,7 @@ import { ProvaViewer } from "@/components/ProvaViewer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, Settings, HelpCircle, Crown, CreditCard, Check } from "lucide-react";
+import { FileText, Settings, HelpCircle, Crown, CreditCard, Check, CheckCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,6 +28,11 @@ interface Profile {
   provas_utilizadas: number;
   name: string;
   email: string;
+  subscription_status?: string;
+  subscription_plan?: string;
+  subscription_start_date?: string;
+  subscription_end_date?: string;
+  asaas_customer_id?: string;
 }
 
 const Dashboard = () => {
@@ -38,6 +43,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [selectedProva, setSelectedProva] = useState<Prova | null>(null);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -367,174 +373,182 @@ const Dashboard = () => {
     </div>
   );
 
+  const handleSubscription = async (plan: 'pro' | 'institutional') => {
+    if (!user) {
+      toast({
+        title: "Erro",
+        description: "Você precisa estar logado para assinar um plano.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsProcessingPayment(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('asaas-payment', {
+        body: { plan }
+      });
+
+      if (error) throw error;
+
+      // Open payment URL in new tab
+      if (data.paymentUrl) {
+        window.open(data.paymentUrl, '_blank');
+        toast({
+          title: "Pagamento iniciado",
+          description: "Uma nova aba foi aberta com os detalhes do pagamento.",
+        });
+      }
+
+    } catch (error: any) {
+      console.error('Payment error:', error);
+      toast({
+        title: "Erro no pagamento",
+        description: error.message || "Erro ao processar pagamento. Tente novamente.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
+  const getSubscriptionStatus = () => {
+    if (!profile) return { status: 'free', plan: 'Free', maxProvas: 5 };
+    
+    const { subscription_status, subscription_plan, subscription_end_date } = profile;
+    
+    if (subscription_status === 'active' && subscription_end_date) {
+      const endDate = new Date(subscription_end_date);
+      const now = new Date();
+      
+      if (endDate > now) {
+        const planName = subscription_plan === 'pro' ? 'Pro' : 'Institucional';
+        const maxProvas = subscription_plan === 'pro' ? 100 : 'Ilimitadas';
+        return { status: 'active', plan: planName, maxProvas, endDate };
+      }
+    }
+    
+    return { status: 'free', plan: 'Free', maxProvas: 5 };
+  };
+
+  const subscriptionStatus = getSubscriptionStatus();
+
   // Assinatura Component
   const AssinaturaView = () => (
-    <div className="p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Crown className="h-5 w-5" />
-            Gerenciar Assinatura
-          </CardTitle>
-          <CardDescription>
-            Escolha o plano que melhor se adapta às suas necessidades
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-6 md:grid-cols-3">
-            {/* Plano Gratuito */}
-            <Card className={`relative ${profile?.plan === 'free' ? 'ring-2 ring-primary' : ''}`}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">Gratuito</CardTitle>
-                  {profile?.plan === 'free' && (
-                    <Badge variant="default">Atual</Badge>
-                  )}
-                </div>
-                <div className="text-2xl font-bold text-muted-foreground">R$ 0</div>
-                <CardDescription>Para começar</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    10 provas por mês
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Todos os tipos de questão
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Suporte por email
-                  </li>
-                </ul>
-                <Button 
-                  variant={profile?.plan === 'free' ? 'outline' : 'default'} 
-                  className="w-full"
-                  disabled={profile?.plan === 'free'}
-                >
-                  {profile?.plan === 'free' ? 'Plano Atual' : 'Escolher Gratuito'}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Plano Pro */}
-            <Card className={`relative ${profile?.plan === 'pro' ? 'ring-2 ring-primary' : ''}`}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">Pro</CardTitle>
-                  {profile?.plan === 'pro' && (
-                    <Badge variant="default">Atual</Badge>
-                  )}
-                </div>
-                <div className="text-2xl font-bold">R$ 29,90</div>
-                <CardDescription>Por mês</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    100 provas por mês
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Todos os tipos de questão
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Suporte prioritário
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Histórico completo
-                  </li>
-                </ul>
-                <Button 
-                  variant={profile?.plan === 'pro' ? 'outline' : 'default'} 
-                  className="w-full"
-                  disabled={profile?.plan === 'pro'}
-                  onClick={() => {
-                    toast({
-                      title: "Em breve",
-                      description: "Integração com Asaas será configurada em breve",
-                    });
-                  }}
-                >
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  {profile?.plan === 'pro' ? 'Plano Atual' : 'Assinar Pro'}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Plano Institucional */}
-            <Card className={`relative ${profile?.plan === 'institucional' ? 'ring-2 ring-primary' : ''}`}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">Institucional</CardTitle>
-                  {profile?.plan === 'institucional' && (
-                    <Badge variant="default">Atual</Badge>
-                  )}
-                </div>
-                <div className="text-2xl font-bold">R$ 99,90</div>
-                <CardDescription>Por mês</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Provas ilimitadas
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Todos os tipos de questão
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Suporte dedicado
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Múltiplos usuários
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    API personalizada
-                  </li>
-                </ul>
-                <Button 
-                  variant={profile?.plan === 'institucional' ? 'outline' : 'default'} 
-                  className="w-full"
-                  disabled={profile?.plan === 'institucional'}
-                  onClick={() => {
-                    toast({
-                      title: "Em breve",
-                      description: "Integração com Asaas será configurada em breve",
-                    });
-                  }}
-                >
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  {profile?.plan === 'institucional' ? 'Plano Atual' : 'Assinar Institucional'}
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-
-          {profile?.plan !== 'free' && (
-            <div className="mt-8 p-4 border rounded-lg bg-muted/30">
-              <h3 className="font-medium mb-2">Informações da Assinatura</h3>
-              <div className="text-sm text-muted-foreground space-y-1">
-                <p>Plano atual: <span className="font-medium">{getPlanoInfo().nome}</span></p>
-                <p>Próxima cobrança: Em breve (integração Asaas)</p>
-                <p>Método de pagamento: A configurar</p>
-              </div>
-              <Button variant="outline" size="sm" className="mt-3">
-                Cancelar Assinatura
-              </Button>
+    <div className="max-w-4xl mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-8">Assinatura</h1>
+      
+      <div className="grid md:grid-cols-2 gap-8">
+        {/* Plano Pro */}
+        <div className="border border-border rounded-lg p-6 bg-card">
+          <div className="text-center mb-6">
+            <h3 className="text-2xl font-bold mb-2">Plano Pro</h3>
+            <div className="text-3xl font-bold text-primary mb-4">
+              R$ 29,90<span className="text-sm font-normal text-muted-foreground">/mês</span>
             </div>
+          </div>
+          
+          <ul className="space-y-3 mb-6">
+            <li className="flex items-center">
+              <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+              Até 100 provas por mês
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+              Suporte prioritário
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+              Formatos avançados de prova
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+              Histórico completo
+            </li>
+          </ul>
+          
+          <Button 
+            className="w-full" 
+            size="lg"
+            onClick={() => handleSubscription('pro')}
+            disabled={isProcessingPayment || subscriptionStatus.status === 'active'}
+          >
+            {subscriptionStatus.status === 'active' && subscriptionStatus.plan === 'Pro' 
+              ? 'Plano Ativo' 
+              : isProcessingPayment 
+                ? 'Processando...' 
+                : 'Assinar Plano Pro'
+            }
+          </Button>
+        </div>
+
+        {/* Plano Institucional */}
+        <div className="border border-border rounded-lg p-6 bg-card relative">
+          <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+            <span className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium">
+              Mais Popular
+            </span>
+          </div>
+          
+          <div className="text-center mb-6">
+            <h3 className="text-2xl font-bold mb-2">Plano Institucional</h3>
+            <div className="text-3xl font-bold text-primary mb-4">
+              R$ 99,90<span className="text-sm font-normal text-muted-foreground">/mês</span>
+            </div>
+          </div>
+          
+          <ul className="space-y-3 mb-6">
+            <li className="flex items-center">
+              <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+              Provas ilimitadas
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+              Gestão de equipes
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+              Relatórios detalhados
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+              Suporte dedicado 24/7
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+              API para integração
+            </li>
+          </ul>
+          
+          <Button 
+            className="w-full" 
+            size="lg" 
+            variant="default"
+            onClick={() => handleSubscription('institutional')}
+            disabled={isProcessingPayment || subscriptionStatus.status === 'active'}
+          >
+            {subscriptionStatus.status === 'active' && subscriptionStatus.plan === 'Institucional' 
+              ? 'Plano Ativo' 
+              : isProcessingPayment 
+                ? 'Processando...' 
+                : 'Assinar Plano Institucional'
+            }
+          </Button>
+        </div>
+      </div>
+      
+      <div className="mt-8 p-4 bg-muted rounded-lg">
+        <h4 className="font-semibold mb-2">Status da Assinatura</h4>
+        <p className="text-muted-foreground">
+          Plano {subscriptionStatus.plan} - {subscriptionStatus.maxProvas} provas
+          {subscriptionStatus.endDate && subscriptionStatus.status === 'active' && (
+            <span className="block text-sm mt-1">
+              Válido até: {new Date(subscriptionStatus.endDate).toLocaleDateString('pt-BR')}
+            </span>
           )}
-        </CardContent>
-      </Card>
+        </p>
+      </div>
     </div>
   );
 
