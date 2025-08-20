@@ -1,0 +1,4 @@
+project_id = "adfogztisprrlgjlmozy"
+
+[functions.generate-prova]
+verify_jwt = true
