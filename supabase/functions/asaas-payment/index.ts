@@ -91,7 +91,7 @@ const handler = async (req: Request): Promise<Response> => {
         body: JSON.stringify({
           name: profile.name,
           email: profile.email,
-          cpfCnpj: profile.email, // Use email as identifier
+          // Don't send CPF/CNPJ for now to avoid validation errors
         }),
       });
 
