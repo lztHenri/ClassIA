@@ -383,34 +383,20 @@ const Dashboard = () => {
       return;
     }
 
-    setIsProcessingPayment(true);
+    // Links diretos do Asaas para cada plano
+    const paymentLinks = {
+      pro: 'https://www.asaas.com/c/8052485516439', // Substitua pelo seu link real
+      institutional: 'https://www.asaas.com/c/8052485516440' // Substitua pelo seu link real
+    };
+
+    // Abrir link de pagamento em nova aba
+    const paymentUrl = paymentLinks[plan];
+    window.open(paymentUrl, '_blank');
     
-    try {
-      const { data, error } = await supabase.functions.invoke('asaas-payment', {
-        body: { plan }
-      });
-
-      if (error) throw error;
-
-      // Open payment URL in new tab
-      if (data.paymentUrl) {
-        window.open(data.paymentUrl, '_blank');
-        toast({
-          title: "Pagamento iniciado",
-          description: "Uma nova aba foi aberta com os detalhes do pagamento.",
-        });
-      }
-
-    } catch (error: any) {
-      console.error('Payment error:', error);
-      toast({
-        title: "Erro no pagamento",
-        description: error.message || "Erro ao processar pagamento. Tente novamente.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsProcessingPayment(false);
-    }
+    toast({
+      title: "Redirecionando para pagamento",
+      description: "Uma nova aba foi aberta com os detalhes do pagamento. Após o pagamento, seu plano será ativado automaticamente.",
+    });
   };
 
   const getSubscriptionStatus = () => {
