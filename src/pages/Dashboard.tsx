@@ -231,14 +231,14 @@ const Dashboard = () => {
 
   // Main Chat Interface Component
   const ChatInterfaceView = () => (
-    <div className="h-screen flex flex-col p-6">
+    <div className="h-screen flex flex-col p-3 md:p-6">
       <ChatInterface />
     </div>
   );
 
   // Histórico Component
   const HistoricoView = () => (
-    <div className="p-6">
+    <div className="p-3 md:p-6">
       <Card>
         <CardHeader>
           <CardTitle>Histórico de Provas</CardTitle>
@@ -255,7 +255,7 @@ const Dashboard = () => {
               </p>
             </div>
           ) : (
-            <div className="grid gap-4">
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {provas.map((prova) => (
                 <ProvaCard
                   key={prova.id}
@@ -273,7 +273,7 @@ const Dashboard = () => {
 
   // Configurações Component
   const ConfiguracoesView = () => (
-    <div className="p-6">
+    <div className="p-3 md:p-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -285,7 +285,7 @@ const Dashboard = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <label className="text-sm font-medium">Nome</label>
               <div className="p-3 border rounded-md bg-muted/50">
@@ -321,7 +321,7 @@ const Dashboard = () => {
 
   // Ajuda Component
   const AjudaView = () => (
-    <div className="p-6">
+    <div className="p-3 md:p-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -424,35 +424,35 @@ const Dashboard = () => {
 
   // Assinatura Component
   const AssinaturaView = () => (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8">Assinatura</h1>
+    <div className="max-w-4xl mx-auto p-3 md:p-6">
+      <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Assinatura</h1>
       
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
         {/* Plano Pro */}
-        <div className="border border-border rounded-lg p-6 bg-card">
-          <div className="text-center mb-6">
-            <h3 className="text-2xl font-bold mb-2">Plano Pro</h3>
-            <div className="text-3xl font-bold text-primary mb-4">
+        <div className="border border-border rounded-lg p-4 md:p-6 bg-card">
+          <div className="text-center mb-4 md:mb-6">
+            <h3 className="text-xl md:text-2xl font-bold mb-2">Plano Pro</h3>
+            <div className="text-2xl md:text-3xl font-bold text-primary mb-4">
               R$ 29,90<span className="text-sm font-normal text-muted-foreground">/mês</span>
             </div>
           </div>
           
-          <ul className="space-y-3 mb-6">
+          <ul className="space-y-2 md:space-y-3 mb-4 md:mb-6">
             <li className="flex items-center">
-              <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
-              Até 100 provas por mês
+              <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-green-500 mr-2 md:mr-3 flex-shrink-0" />
+              <span className="text-sm md:text-base">Até 100 provas por mês</span>
             </li>
             <li className="flex items-center">
-              <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
-              Suporte prioritário
+              <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-green-500 mr-2 md:mr-3 flex-shrink-0" />
+              <span className="text-sm md:text-base">Suporte prioritário</span>
             </li>
             <li className="flex items-center">
-              <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
-              Formatos avançados de prova
+              <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-green-500 mr-2 md:mr-3 flex-shrink-0" />
+              <span className="text-sm md:text-base">Formatos avançados de prova</span>
             </li>
             <li className="flex items-center">
-              <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
-              Histórico completo
+              <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-green-500 mr-2 md:mr-3 flex-shrink-0" />
+              <span className="text-sm md:text-base">Histórico completo</span>
             </li>
           </ul>
           
@@ -472,40 +472,40 @@ const Dashboard = () => {
         </div>
 
         {/* Plano Institucional */}
-        <div className="border border-border rounded-lg p-6 bg-card relative">
+        <div className="border border-border rounded-lg p-4 md:p-6 bg-card relative">
           <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-            <span className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium">
+            <span className="bg-primary text-primary-foreground px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-medium">
               Mais Popular
             </span>
           </div>
           
-            <div className="text-center mb-6">
-            <h3 className="text-2xl font-bold mb-2">Plano Institucional</h3>
-            <div className="text-2xl font-bold text-primary mb-4">
+          <div className="text-center mb-4 md:mb-6 mt-2">
+            <h3 className="text-xl md:text-2xl font-bold mb-2">Plano Institucional</h3>
+            <div className="text-xl md:text-2xl font-bold text-primary mb-4">
               Consultar Atendente
             </div>
           </div>
           
-          <ul className="space-y-3 mb-6">
+          <ul className="space-y-2 md:space-y-3 mb-4 md:mb-6">
             <li className="flex items-center">
-              <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
-              Provas ilimitadas
+              <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-green-500 mr-2 md:mr-3 flex-shrink-0" />
+              <span className="text-sm md:text-base">Provas ilimitadas</span>
             </li>
             <li className="flex items-center">
-              <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
-              Gestão de equipes
+              <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-green-500 mr-2 md:mr-3 flex-shrink-0" />
+              <span className="text-sm md:text-base">Gestão de equipes</span>
             </li>
             <li className="flex items-center">
-              <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
-              Relatórios detalhados
+              <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-green-500 mr-2 md:mr-3 flex-shrink-0" />
+              <span className="text-sm md:text-base">Relatórios detalhados</span>
             </li>
             <li className="flex items-center">
-              <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
-              Suporte dedicado 24/7
+              <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-green-500 mr-2 md:mr-3 flex-shrink-0" />
+              <span className="text-sm md:text-base">Suporte dedicado 24/7</span>
             </li>
             <li className="flex items-center">
-              <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
-              API para integração
+              <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-green-500 mr-2 md:mr-3 flex-shrink-0" />
+              <span className="text-sm md:text-base">API para integração</span>
             </li>
           </ul>
           
@@ -526,12 +526,12 @@ const Dashboard = () => {
         </div>
       </div>
       
-      <div className="mt-8 p-4 bg-muted rounded-lg">
-        <h4 className="font-semibold mb-2">Status da Assinatura</h4>
-        <p className="text-muted-foreground">
+      <div className="mt-6 md:mt-8 p-3 md:p-4 bg-muted rounded-lg">
+        <h4 className="font-semibold mb-2 text-sm md:text-base">Status da Assinatura</h4>
+        <p className="text-muted-foreground text-sm md:text-base">
           Plano {subscriptionStatus.plan} - {subscriptionStatus.maxProvas} provas
           {subscriptionStatus.endDate && subscriptionStatus.status === 'active' && (
-            <span className="block text-sm mt-1">
+            <span className="block text-xs md:text-sm mt-1">
               Válido até: {new Date(subscriptionStatus.endDate).toLocaleDateString('pt-BR')}
             </span>
           )}
@@ -552,7 +552,7 @@ const Dashboard = () => {
         onLogout={handleLogout}
       />
       
-      <div className="flex-1 md:ml-64">
+      <div className="flex-1 md:ml-64 w-full overflow-x-hidden">
         <Routes>
           <Route index element={<ChatInterfaceView />} />
           <Route path="historico" element={<HistoricoView />} />
