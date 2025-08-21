@@ -81,7 +81,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Create customer in Asaas if doesn't exist
     if (!customerId) {
-      const customerResponse = await fetch('https://sandbox.asaas.com/api/v3/customers', {
+      // Use production URL instead of sandbox
+      const customerResponse = await fetch('https://www.asaas.com/api/v3/customers', {
         method: 'POST',
         headers: {
           'access_token': asaasApiKey,
@@ -90,7 +91,7 @@ const handler = async (req: Request): Promise<Response> => {
         body: JSON.stringify({
           name: profile.name,
           email: profile.email,
-          cpfCnpj: profile.email, // Use email as CPF for testing
+          cpfCnpj: profile.email, // Use email as identifier
         }),
       });
 
@@ -111,7 +112,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Create payment in Asaas
-    const paymentResponse = await fetch('https://sandbox.asaas.com/api/v3/payments', {
+    const paymentResponse = await fetch('https://www.asaas.com/api/v3/payments', {
       method: 'POST',
       headers: {
         'access_token': asaasApiKey,
@@ -119,7 +120,7 @@ const handler = async (req: Request): Promise<Response> => {
       },
       body: JSON.stringify({
         customer: customerId,
-        billingType: 'CREDIT_CARD',
+        billingType: 'PIX',
         dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Tomorrow
         value: plans[plan].value,
         description: `Assinatura ${plans[plan].name} - Class IA`,
