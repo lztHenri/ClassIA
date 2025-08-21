@@ -383,20 +383,22 @@ const Dashboard = () => {
       return;
     }
 
-    // Links diretos do Asaas para cada plano
-    const paymentLinks = {
-      pro: 'https://www.asaas.com/c/8052485516439', // Substitua pelo seu link real
-      institutional: 'https://www.asaas.com/c/8052485516440' // Substitua pelo seu link real
-    };
-
-    // Abrir link de pagamento em nova aba
-    const paymentUrl = paymentLinks[plan];
-    window.open(paymentUrl, '_blank');
-    
-    toast({
-      title: "Redirecionando para pagamento",
-      description: "Uma nova aba foi aberta com os detalhes do pagamento. Após o pagamento, seu plano será ativado automaticamente.",
-    });
+    if (plan === 'pro') {
+      // Link real do plano Pro
+      const paymentUrl = 'https://www.asaas.com/c/xmqwmtgw5llu8bte';
+      window.open(paymentUrl, '_blank');
+      
+      toast({
+        title: "Redirecionando para pagamento",
+        description: "Uma nova aba foi aberta com os detalhes do pagamento. Após o pagamento, seu plano será ativado automaticamente.",
+      });
+    } else if (plan === 'institutional') {
+      // Para plano institucional, redirecionar para contato
+      toast({
+        title: "Plano Institucional",
+        description: "Entre em contato através do email: suporte@classia.com.br para mais informações sobre o plano institucional.",
+      });
+    }
   };
 
   const getSubscriptionStatus = () => {
@@ -477,10 +479,10 @@ const Dashboard = () => {
             </span>
           </div>
           
-          <div className="text-center mb-6">
+            <div className="text-center mb-6">
             <h3 className="text-2xl font-bold mb-2">Plano Institucional</h3>
-            <div className="text-3xl font-bold text-primary mb-4">
-              R$ 99,90<span className="text-sm font-normal text-muted-foreground">/mês</span>
+            <div className="text-2xl font-bold text-primary mb-4">
+              Consultar Atendente
             </div>
           </div>
           
@@ -518,7 +520,7 @@ const Dashboard = () => {
               ? 'Plano Ativo' 
               : isProcessingPayment 
                 ? 'Processando...' 
-                : 'Assinar Plano Institucional'
+                : 'Consultar Atendente'
             }
           </Button>
         </div>
